@@ -40,3 +40,9 @@ captures/
 *.jks
 
 *.idea
+*.gradle
+gradle.properties
+*.bat
+gradlew
+
+gradle/
