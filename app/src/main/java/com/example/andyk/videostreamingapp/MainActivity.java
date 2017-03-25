@@ -32,16 +32,9 @@ public class MainActivity extends AppCompatActivity {
 
         Intent intent = getIntent();
 
-       connectBtn.setOnClickListener(new View.OnClickListener() {
-           @Override
-           public void onClick(View v) {
-               controller.connectButton(v);
-           }
-       });
-    }
-
-    public int getPortNumber(){
-        return Integer.parseInt(portTxt.getText().toString());
+        connectBtn.setOnClickListener( v-> controller.connectButton(v));
+        exitBtn.setOnClickListener(v->System.exit(1));
+        setupBtn.setOnClickListener(v->controller.setupStream());
     }
 
 }

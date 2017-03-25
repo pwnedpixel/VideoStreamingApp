@@ -25,6 +25,7 @@ public class Controller {
     public Controller(Context context){
         tmr = new Timer();
         this.context=context;
+
     }
 
     public void connectButton(View v){
@@ -36,11 +37,28 @@ public class Controller {
         rtspModel = new RTSPmodel(Integer.parseInt(aaa.getText().toString()),bbb.getText().toString());
 
         rtspModel.createSocket();
-        if (rtspModel.openConnection()){
-            System.out.println("Connected");
-        } else {
-            System.out.println("Error connecting");
-        }
+        rtspModel.openConnection(args -> {
+
+        });
+
     }
 
+    public void setupStream(){
+        String portNum = ((EditText) ((Activity)context).findViewById(R.id.portTxt)).getText().toString();
+        String ipAddr =((EditText) ((Activity)context).findViewById(R.id.ipTxt)).getText().toString();
+
+        seqNumber = 2;
+
+        //build the request
+        String req = "SETUP rtsp://"+ipAddr+":"+portNum+"/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+                seqNumber + "\r\nTransport: RTP/UDP; client_port= 2000\r\n";
+        rtspModel.sendRequest(req, args -> {
+            String res = args[0].toString();
+            if (!res.equals("")){
+                char[] splitBy = { '\r', '\n', ' ', ',', ';', ':', '/' };
+                String[] segments = res.split("(\\n)(\\r)( )(,)(;)(:)(/)");
+                System.out.println(res);
+            }
+        });
+    }
 }
