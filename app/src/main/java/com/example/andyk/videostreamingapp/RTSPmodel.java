@@ -42,10 +42,10 @@ public class RTSPmodel {
     }
 
     public void openConnection(SuccessHandler handler){
-        new SocketCreateTask(){
+        new SocketConnectTask(){
             @Override
-            protected void onPostExecute(Void aVoid) {
-                super.onPostExecute(aVoid);
+            protected void onPostExecute(Void avoid) {
+                super.onPostExecute(avoid);
                 handler.onComplete();
             }
         }.execute();
@@ -55,13 +55,12 @@ public class RTSPmodel {
             @Override
             protected void onPostExecute(String response) {
                 super.onPostExecute(response);
-                System.out.println("post execute");
                 handler.onComplete(response);
             }
         }.execute(req);
     }
 
-    public class SocketCreateTask extends AsyncTask<Void, Integer, Void>{
+    public class SocketConnectTask extends AsyncTask<Void, Integer, Void>{
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -84,8 +83,8 @@ public class RTSPmodel {
             byte[] serverResponse = new byte[4096];
             try {
                 message = params[0].toString().getBytes("UTF-8");
+                params[0].toString().replace("\0","");
                 System.out.println("Encoding: \r\n"+params[0].toString());
-                System.out.println("message encoded:\r\n"+message.toString());
             } catch(Exception e){
                 System.err.println("Error encoding message: "+e);
             }

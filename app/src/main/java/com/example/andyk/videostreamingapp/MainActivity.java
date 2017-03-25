@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
         connectBtn.setOnClickListener( v-> controller.connectButton(v));
         exitBtn.setOnClickListener(v->System.exit(1));
         setupBtn.setOnClickListener(v->controller.setupStream());
+        playBtn.setOnClickListener(v->controller.playStream());
     }
 
 }
