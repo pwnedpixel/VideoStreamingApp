@@ -10,9 +10,9 @@ import android.widget.EditText;
 
 public class MainActivity extends AppCompatActivity {
 
-    private Button connectBtn,exitBtn,setupBtn,playBtn,pausebtn,teardownBtn;
+    Button connectBtn,exitBtn,setupBtn,playBtn,pauseBtn,teardownBtn;
 
-    private EditText ipTxt,portTxt;
+    EditText ipTxt,portTxt;
 
     private Controller controller;
 
@@ -25,17 +25,23 @@ public class MainActivity extends AppCompatActivity {
         exitBtn = (Button) findViewById(R.id.exitBtn);
         setupBtn = (Button) findViewById(R.id.setupBtn);
         playBtn = (Button) findViewById(R.id.playBtn);
-        pausebtn = (Button) findViewById(R.id.pauseBtn);
+        pauseBtn = (Button) findViewById(R.id.pauseBtn);
         teardownBtn = (Button) findViewById(R.id.teardownBtn);
         ipTxt = (EditText) findViewById(R.id.ipTxt);
         portTxt = (EditText) findViewById(R.id.portTxt);
 
         Intent intent = getIntent();
 
-        connectBtn.setOnClickListener( v-> controller.connectButton(v));
+        connectBtn.setOnClickListener(v-> controller.connectButton());
         exitBtn.setOnClickListener(v->System.exit(1));
         setupBtn.setOnClickListener(v->controller.setupStream());
         playBtn.setOnClickListener(v->controller.playStream());
+        pauseBtn.setOnClickListener(v->controller.pauseStream());
+        teardownBtn.setOnClickListener(v->controller.teardownStream());
+    }
+
+    public void test(){
+
     }
 
 }

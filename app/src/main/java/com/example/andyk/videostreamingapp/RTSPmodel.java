@@ -32,25 +32,20 @@ public class RTSPmodel {
         }
     }
 
-    public void createSocket(){
+    void createSocket(){
         endPoint=new InetSocketAddress(ipAddr,port);
         try {
             sockt=new Socket();
         } catch (Exception e) {
-            System.err.println("Error creating socket: "+e);
+            System.err.println("Error creating TCP socket: "+e);
         }
     }
 
-    public void openConnection(SuccessHandler handler){
-        new SocketConnectTask(){
-            @Override
-            protected void onPostExecute(Void avoid) {
-                super.onPostExecute(avoid);
-                handler.onComplete();
-            }
-        }.execute();
+    public boolean isConnected(){
+        return sockt.isConnected();
     }
-    public void sendRequest(String req, SuccessHandler handler){
+
+    void sendRequest(String req, SuccessHandler handler){
         new SendRequestTask(){
             @Override
             protected void onPostExecute(String response) {
@@ -60,7 +55,17 @@ public class RTSPmodel {
         }.execute(req);
     }
 
-    public class SocketConnectTask extends AsyncTask<Void, Integer, Void>{
+    void openConnection(SuccessHandler handler){
+        new SocketConnectTask(){
+            @Override
+            protected void onPostExecute(Void avoid) {
+                super.onPostExecute(avoid);
+                handler.onComplete();
+            }
+        }.execute();
+    }
+
+    private class SocketConnectTask extends AsyncTask<Void, Integer, Void>{
 
         @Override
         protected Void doInBackground(Void... params) {
@@ -75,16 +80,14 @@ public class RTSPmodel {
         }
     }
 
-    public class SendRequestTask extends AsyncTask<String, Integer, String> {
+    private class SendRequestTask extends AsyncTask<String, Integer, String> {
 
         @Override
         protected String doInBackground(String... params) {
             byte[] message = new byte[4096];
             byte[] serverResponse = new byte[4096];
             try {
-                message = params[0].toString().getBytes("UTF-8");
-                params[0].toString().replace("\0","");
-                System.out.println("Encoding: \r\n"+params[0].toString());
+                message = params[0].getBytes("UTF-8");
             } catch(Exception e){
                 System.err.println("Error encoding message: "+e);
             }
@@ -92,9 +95,7 @@ public class RTSPmodel {
             //Sending the message
             try{
                 DataOutputStream dOut = new DataOutputStream(sockt.getOutputStream());
-                //dOut.writeInt(params[0].toString().length());
                 dOut.write(message);
-
                 System.out.println("message Sent");
             } catch (Exception e){
                 System.err.println("Error sending message: "+e);
@@ -114,7 +115,7 @@ public class RTSPmodel {
     }
 
     public interface SuccessHandler{
-        public void onComplete(final String... args);
+        void onComplete(final String... args);
     }
 
 

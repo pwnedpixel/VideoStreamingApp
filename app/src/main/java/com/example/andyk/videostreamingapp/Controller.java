@@ -5,6 +5,7 @@ import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 
@@ -17,7 +18,6 @@ import java.util.TimerTask;
  */
 
 public class Controller {
-    private static View view;
     Context context;
     String session = "";
     int seqNumber;
@@ -33,17 +33,26 @@ public class Controller {
 
     }
 
-    public void connectButton(View v){
+    public void connectButton(){
+        Button playBtn = ((Button) ((Activity)context).findViewById(R.id.playBtn));
+        Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
+        Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
+        Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
         System.out.println("Connect Button Pressed");
-        view = v;
 
-        EditText aaa = (EditText) ((Activity)context).findViewById(R.id.portTxt);
-        EditText bbb = (EditText) ((Activity)context).findViewById(R.id.ipTxt);
-        rtspModel = new RTSPmodel(Integer.parseInt(aaa.getText().toString()),bbb.getText().toString());
+        EditText port = (EditText) ((Activity)context).findViewById(R.id.portTxt);
+        EditText ip = (EditText) ((Activity)context).findViewById(R.id.ipTxt);
+        rtspModel = new RTSPmodel(Integer.parseInt(port.getText().toString()),ip.getText().toString());
 
         rtspModel.createSocket();
         rtspModel.openConnection(args -> {
-            System.out.println("hi");
+            System.out.println("connection opened");
+            if (rtspModel.isConnected()){
+                setupBtn.setEnabled(true);
+                playBtn.setEnabled(false);
+                pauseBtn.setEnabled(false);
+                teardownBtn.setEnabled(true);
+            }
         });
 
     }
@@ -51,6 +60,10 @@ public class Controller {
     public void setupStream(){
         String portNum = ((EditText) ((Activity)context).findViewById(R.id.portTxt)).getText().toString();
         String ipAddr =((EditText) ((Activity)context).findViewById(R.id.ipTxt)).getText().toString();
+        Button playBtn = ((Button) ((Activity)context).findViewById(R.id.playBtn));
+        Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
+        Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
+        Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
 
         seqNumber = 2;
 
@@ -60,19 +73,17 @@ public class Controller {
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();
             if (!res.equals("")){
-                char[] splitBy = { '\r', '\n', ' ', ',', ';', ':', '/' };
-//                String[] segments = res.split("(\\n)(\\r)( )(,)(;)(:)(/)");
                 String[] segments = res.split("[\\s\\n\\r +,;:/(\0)]");
-                System.out.println("PREPRINT");
-                System.out.println("segments size: "+segments.length);
-                System.out.println(segments[11]);
-                System.out.println("POSTPRINT");
                 session = segments[11];
-
                 rtpModel = new RTPmodel(Integer.parseInt(portNum),ipAddr);
                 rtpModel.createSocket();
                 isPaused = false;
                 teardown = false;
+
+                setupBtn.setEnabled(false);
+                playBtn.setEnabled(true);
+                pauseBtn.setEnabled(false);
+                teardownBtn.setEnabled(true);
             }
         });
     }
@@ -80,7 +91,13 @@ public class Controller {
     public void playStream(){
         String portNum = ((EditText) ((Activity)context).findViewById(R.id.portTxt)).getText().toString();
         String ipAddr =((EditText) ((Activity)context).findViewById(R.id.ipTxt)).getText().toString();
+        Button playBtn = ((Button) ((Activity)context).findViewById(R.id.playBtn));
+        Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
+        Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
+        Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
         seqNumber++;
+        isPaused = false;
+        teardown = false;
 
         //build the request
         String req = "PLAY rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
@@ -88,34 +105,81 @@ public class Controller {
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();
             if (!res.equals("")){
-                tmr .schedule(new TimerTask() {
-                    @Override
-                    public void run() {
-                        timerTick();
-                    }
-                },0,1000);
-                isPaused = false;
-                teardown = false;
+                setupBtn.setEnabled(false);
+                playBtn.setEnabled(false);
+                pauseBtn.setEnabled(true);
+                teardownBtn.setEnabled(true);
+                timerTick();
             }
         });
     }
 
-    public void timerTick(){
-        ImageView im = ((ImageView) ((Activity)context).findViewById(R.id.imageView2));
-        System.out.println("tick");
-        //array to hold the frame to play
-        byte[] nextFrame = new byte[100000];
+    public void pauseStream(){
+        String portNum = ((EditText) ((Activity)context).findViewById(R.id.portTxt)).getText().toString();
+        String ipAddr =((EditText) ((Activity)context).findViewById(R.id.ipTxt)).getText().toString();
+        Button playBtn = ((Button) ((Activity)context).findViewById(R.id.playBtn));
+        Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
+        Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
+        Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
+        seqNumber++;
 
-        //get the frame from the rtpmodel
-        rtpModel.getFrame(args -> {
-            if (nextFrame != null && isPaused == false){
-                ByteArrayInputStream iStream = new ByteArrayInputStream(nextFrame);
-                Bitmap bm = BitmapFactory.decodeStream(iStream);
-                im.setImageBitmap(bm);
-                System.out.println("Image Set");
-            } else {
-                System.out.println("Image not set: "+nextFrame!=null+" "+isPaused);
+        String req = "PAUSE rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+                seqNumber + "\r\nSession:  " + session + "\r\n";
+        rtspModel.sendRequest(req, args -> {
+            String res = args[0].toString();
+            if (!res.equals("")){
+                System.out.println("PausedPlayback");
+                setupBtn.setEnabled(false);
+                playBtn.setEnabled(true);
+                pauseBtn.setEnabled(false);
+                teardownBtn.setEnabled(true);
             }
         });
+        isPaused = true;
+        teardown = false;
+    }
+
+    public void teardownStream(){
+        String portNum = ((EditText) ((Activity)context).findViewById(R.id.portTxt)).getText().toString();
+        String ipAddr =((EditText) ((Activity)context).findViewById(R.id.ipTxt)).getText().toString();
+        Button playBtn = ((Button) ((Activity)context).findViewById(R.id.playBtn));
+        Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
+        Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
+        Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
+        seqNumber++;
+
+        String req = "TEARDOWN rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+                seqNumber + "\r\nSession:  " + session + "\r\n";
+        rtspModel.sendRequest(req, args -> {
+            String res = args[0].toString();
+            if (!res.equals("")){
+                rtpModel.closeConnection();
+                System.out.println("Teardown Complete");
+                setupBtn.setEnabled(true);
+                playBtn.setEnabled(false);
+                pauseBtn.setEnabled(false);
+                teardownBtn.setEnabled(false);
+            }
+        });
+        isPaused = false;
+        teardown = true;
+    }
+
+    private void timerTick() {
+        ImageView im = ((ImageView) ((Activity) context).findViewById(R.id.imageView2));
+
+        if (!isPaused && !teardown) {
+            //get the image from the rtpmodel
+            rtpModel.getFrame(args -> {
+                im.setImageBitmap(args[0]);
+                tmr.schedule(new TimerTask() {
+                    @Override
+                    public void run() {
+                        timerTick();
+                    }
+                },30);
+            });
+
+        }
     }
 }

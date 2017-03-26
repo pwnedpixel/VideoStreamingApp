@@ -70,26 +70,28 @@
         android:id="@+id/playBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Play"
-        tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/ipTxt"
-        app:layout_constraintLeft_toRightOf="@+id/setupBtn"
+        android:layout_marginBottom="-14dp"
         android:layout_marginLeft="10dp"
         android:layout_marginStart="8dp"
-        android:layout_marginBottom="-14dp" />
+        android:enabled="false"
+        android:text="Play"
+        app:layout_constraintBottom_toTopOf="@+id/ipTxt"
+        app:layout_constraintLeft_toRightOf="@+id/setupBtn"
+        tools:layout_constraintBottom_creator="1" />
 
     <Button
         android:id="@+id/pauseBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Pause"
-        tools:layout_constraintLeft_creator="1"
+        android:layout_marginBottom="-19dp"
+        android:layout_marginLeft="183dp"
         android:layout_marginStart="7dp"
-        tools:layout_constraintBottom_creator="1"
+        android:enabled="false"
+        android:text="Pause"
         app:layout_constraintBottom_toTopOf="@+id/ipTxt"
         app:layout_constraintLeft_toRightOf="@+id/playBtn"
-        android:layout_marginLeft="183dp"
-        android:layout_marginBottom="-19dp" />
+        tools:layout_constraintBottom_creator="1"
+        tools:layout_constraintLeft_creator="1" />
 
     <Button
         android:id="@+id/teardownBtn"
@@ -97,6 +99,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="8dp"
         android:layout_marginStart="8dp"
+        android:enabled="false"
         android:text="Teardown"
         app:layout_constraintBaseline_toBaselineOf="@+id/pauseBtn"
         app:layout_constraintLeft_toRightOf="@+id/pauseBtn"
@@ -106,9 +109,10 @@
         android:id="@+id/setupBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:text="Setup"
+        app:layout_constraintBottom_toTopOf="@+id/ipTxt"
         app:layout_constraintLeft_toLeftOf="parent"
-        tools:layout_constraintLeft_creator="1"
         tools:layout_constraintBottom_creator="1"
-        app:layout_constraintBottom_toTopOf="@+id/ipTxt" />
+        tools:layout_constraintLeft_creator="1" />
 </android.support.constraint.ConstraintLayout>
