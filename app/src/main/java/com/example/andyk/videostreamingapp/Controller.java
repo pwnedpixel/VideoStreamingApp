@@ -8,6 +8,7 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.Spinner;
 
 import java.io.ByteArrayInputStream;
 import java.util.Timer;
@@ -26,6 +27,7 @@ public class Controller {
     boolean teardown;
     RTPmodel rtpModel;
     RTSPmodel rtspModel;
+    String videoName;
 
     public Controller(Context context){
         tmr = new Timer();
@@ -51,7 +53,7 @@ public class Controller {
                 setupBtn.setEnabled(true);
                 playBtn.setEnabled(false);
                 pauseBtn.setEnabled(false);
-                teardownBtn.setEnabled(true);
+                teardownBtn.setEnabled(false);
             }
         });
 
@@ -64,11 +66,14 @@ public class Controller {
         Button pauseBtn = ((Button) ((Activity)context).findViewById(R.id.pauseBtn));
         Button teardownBtn = ((Button) ((Activity)context).findViewById(R.id.teardownBtn));
         Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
+        Spinner spinner = ((Spinner) ((Activity)context).findViewById(R.id.spinner));
+
+        videoName = spinner.getSelectedItem().toString();
 
         seqNumber = 2;
 
         //build the request
-        String req = "SETUP rtsp://"+ipAddr+":"+portNum+"/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+        String req = "SETUP rtsp://"+ipAddr+":"+portNum+"/"+videoName+".mjpeg RTSP/1.0\r\nCSeq: " +
                 seqNumber + "\r\nTransport: RTP/UDP; client_port= 25000\r\n";
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();
@@ -100,7 +105,7 @@ public class Controller {
         teardown = false;
 
         //build the request
-        String req = "PLAY rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+        String req = "PLAY rtsp://" + ipAddr + ":" + portNum + "/"+videoName+".mjpeg RTSP/1.0\r\nCSeq: " +
                 seqNumber + "\r\nSession:  "+session+"\r\n";
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();
@@ -123,7 +128,7 @@ public class Controller {
         Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
         seqNumber++;
 
-        String req = "PAUSE rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+        String req = "PAUSE rtsp://" + ipAddr + ":" + portNum + "/"+videoName+".mjpeg RTSP/1.0\r\nCSeq: " +
                 seqNumber + "\r\nSession:  " + session + "\r\n";
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();
@@ -148,7 +153,7 @@ public class Controller {
         Button setupBtn = ((Button) ((Activity)context).findViewById(R.id.setupBtn));
         seqNumber++;
 
-        String req = "TEARDOWN rtsp://" + ipAddr + ":" + portNum + "/video3.mjpeg RTSP/1.0\r\nCSeq: " +
+        String req = "TEARDOWN rtsp://" + ipAddr + ":" + portNum + "/"+videoName+".mjpeg RTSP/1.0\r\nCSeq: " +
                 seqNumber + "\r\nSession:  " + session + "\r\n";
         rtspModel.sendRequest(req, args -> {
             String res = args[0].toString();

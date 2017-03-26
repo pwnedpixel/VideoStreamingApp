@@ -7,12 +7,15 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
 
     Button connectBtn,exitBtn,setupBtn,playBtn,pauseBtn,teardownBtn;
 
     EditText ipTxt,portTxt;
+
+    Spinner spinner;
 
     private Controller controller;
 
@@ -29,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
         teardownBtn = (Button) findViewById(R.id.teardownBtn);
         ipTxt = (EditText) findViewById(R.id.ipTxt);
         portTxt = (EditText) findViewById(R.id.portTxt);
+        spinner = (Spinner) findViewById(R.id.spinner);
 
         Intent intent = getIntent();
 
