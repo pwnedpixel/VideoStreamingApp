@@ -7,6 +7,8 @@ import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Spinner;
 
 public class MainActivity extends AppCompatActivity {
@@ -16,6 +18,10 @@ public class MainActivity extends AppCompatActivity {
     EditText ipTxt,portTxt;
 
     Spinner spinner;
+
+    ImageButton imageSetup,imagePlay,imagePause,imageTeardown;
+
+    ImageView imageView2;
 
     private Controller controller;
 
@@ -33,6 +39,11 @@ public class MainActivity extends AppCompatActivity {
         ipTxt = (EditText) findViewById(R.id.ipTxt);
         portTxt = (EditText) findViewById(R.id.portTxt);
         spinner = (Spinner) findViewById(R.id.spinner);
+        imageSetup = (ImageButton) findViewById(R.id.imageSetup);
+        imagePlay = (ImageButton) findViewById(R.id.imagePlay);
+        imagePause = (ImageButton) findViewById(R.id.imagePause);
+        imageTeardown = (ImageButton) findViewById(R.id.imageTeardown);
+        imageView2 = (ImageView) findViewById(R.id.imageView2);
 
         Intent intent = getIntent();
 
@@ -42,9 +53,12 @@ public class MainActivity extends AppCompatActivity {
         playBtn.setOnClickListener(v->controller.playStream());
         pauseBtn.setOnClickListener(v->controller.pauseStream());
         teardownBtn.setOnClickListener(v->controller.teardownStream());
-    }
+        imageSetup.setOnClickListener(v->controller.setupStream());
+        imagePlay.setOnClickListener(v->controller.playStream());
+        imagePause.setOnClickListener(v->controller.pauseStream());
+        imageTeardown.setOnClickListener(v->controller.teardownStream());
+        imageView2.setOnClickListener(v->controller.showButtons());
 
-    public void test(){
 
     }
 

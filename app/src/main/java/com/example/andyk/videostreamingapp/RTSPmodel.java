@@ -70,7 +70,7 @@ public class RTSPmodel {
         @Override
         protected Void doInBackground(Void... params) {
             try{
-                sockt.connect(endPoint,3000);
+                sockt.connect(endPoint,port);
                 System.out.println("connected to server");
             } catch (Exception e){
                 System.out.println("Error connecting with socket: "+e);
